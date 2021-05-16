@@ -1,7 +1,9 @@
 // tailwind.config.js
 const defaultTheme = require('tailwindcss/defaultTheme')
+const colors = require('tailwindcss/colors')
 
 module.exports = {
+    mode: 'jit',
     purge: {
         enabled: process.env.NODE_ENV === 'production',
         safeList: [],
@@ -16,7 +18,15 @@ module.exports = {
             fontFamily: {
                 sans: ['Inter var', ...defaultTheme.fontFamily.sans],
             },
+            colors: {
+                'warm-gray': colors.warmGray,
+                teal: colors.teal,
+            }
         },
     },
+    plugins: [
+        // ...
+        require('@tailwindcss/forms'),
+    ]
     // ...
 }
