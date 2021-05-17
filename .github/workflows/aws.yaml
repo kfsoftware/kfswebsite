@@ -1,0 +1,29 @@
+name: Deployment
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Build Website
+        run: |
+          yarn
+          yarn build
+      - name: Configure AWS credentials
+        if: github.event_name == 'push'
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-west-1
+      - name: Deploy to S3
+        if: github.event_name == 'push'
+        run: aws s3 sync dist/static s3://kfs.es --acl public-read --cache-control max-age=604800 --delete
+      - name: Invalidate CloudFront
+        if: github.event_name == 'push'
+        run:
+          aws cloudfront create-invalidation --distribution-id TODO --paths "/*"
